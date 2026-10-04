@@ -1,0 +1,6 @@
+Options +FollowSymLinks
+
+RewriteEngine on
+RewriteRule ^/?([^/]*).html index.php?url1=$1
+RewriteRule ^/?([^/]*)/([^/]*).html index.php?url1=$1&url2=$2
+RewriteRule ^/?([^/]*)/([^/]*)/([^/]*).html default.php?url1=$1&url2=$2&url3=$3
