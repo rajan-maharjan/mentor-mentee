@@ -42,7 +42,7 @@ class MemberClubrole extends common {
 
     /** All clubs/roles of a member, primary club first. */
     function getByMember($userID) {
-        $whereCond = "id='" . trim($userID) . "'";
+        $whereCond = "id='" . $this->escape(trim($userID)) . "'";
         return parent::select(self::TABLE, array("*"), $whereCond, "is_primary desc, " . self::PRIMARY_ID . " asc");
     }
 
@@ -50,6 +50,10 @@ class MemberClubrole extends common {
     function insertUpdate($memberId, $clubId, $role_code, $isPrimary, $dbPrimaryId = 0) {
         $memberId = trim($memberId);
         $clubId   = trim($clubId);
+        // Fix (SQL injection): dbPrimaryId ultimately comes from client-submitted
+        // form data (club_role_id[]) and was previously concatenated raw into
+        // a SQL WHERE clause. It must always be a row's own integer id.
+        $dbPrimaryId = $this->safeInt($dbPrimaryId);
 
         $arrayFieldValues = array();
         $arrayFieldValues['member_id']  = $memberId;
@@ -75,7 +79,7 @@ class MemberClubrole extends common {
      * @param array $rows each: array('club_id'=>int, 'role_code'=>string, 'is_primary'=>0|1)
      */
     function saveAll($memberId, $rows) {
-        $memberId = trim($memberId);
+        $memberId = $this->escape(trim($memberId));
 
         // Reset primary flag first so only one row ends up primary.
         $this->sql = "UPDATE " . TBL_PREFIX . self::TABLE . " SET is_primary='N' WHERE member_id='$memberId'";
@@ -84,12 +88,14 @@ class MemberClubrole extends common {
         $keepIds = array();
         foreach ($rows as $row) {
             if($row['club_id']>0)
+                // insertUpdate() now always returns a safe int (see above),
+                // so this join is no longer an injection point.
                 $keepIds[] = $this->insertUpdate($memberId, $row['club_id'], $row['role_code'], $row['is_primary'], $row['id']);
         }
 
         // Remove clubs the member took off the form.
         if (count($keepIds) > 0) {
-            $keepIdsText = join(",", $keepIds);
+            $keepIdsText = join(",", array_map('intval', $keepIds));
             $this->sql = "DELETE FROM " . TBL_PREFIX . self::TABLE . " WHERE member_id='$memberId' and id NOT IN ($keepIdsText)";
         } else {
             $this->sql = "DELETE FROM " . TBL_PREFIX . self::TABLE . " WHERE member_id='$memberId'";

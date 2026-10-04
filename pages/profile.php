@@ -74,9 +74,23 @@ if (isset($_POST['btnSubmit'])) {
         $hasError = true;
         $messageText .= "<br />Missing or invalid email address";
     }
+    if (!$objectFunctions->validateCsrfToken($_POST['csrf_token'] ?? '')){
+        $hasError = true;
+        $messageText .= "<br />Your session has expired. Please reload the page and try again.";
+    }
     if ($pnNumber === '') {
         $hasError = true;
         $messageText .= "<br />Missing PN Number of Toastmaster International Portal";
+    }
+    elseif (!preg_match('/^[0-9]{1,10}$/', $pnNumber)) {
+        $hasError = true;
+        $messageText .= "<br />PN Number must be numeric.";
+    }
+    // Fix (IDOR): this field is used as the join key for this member's club/role
+    // records, so it must never be allowed to collide with another account's.
+    elseif ($objectUser->pnNumberBelongsToAnotherMember($pnNumber, $userID)) {
+        $hasError = true;
+        $messageText .= "<br />That PN Number is already associated with another account.";
     }
 
     if ($intro === '') {
@@ -208,6 +222,7 @@ if(isset($_POST['mentor_for']))
     <div class="card-body">
         <h4 class="card-title">Edit Personal Information</h4>
         <form class="form-sample" method="POST" action="" name="profile-update-form">
+        <input type="hidden" name="csrf_token" value="<?php echo $objectFunctions->getCsrfToken()?>" />
         <p class="card-description">
             Personal info
         </p>

@@ -3,9 +3,9 @@
     <div class="col-md-12 grid-margin">
       <div class="row">
         <div class="col-12 col-xl-8 mb-4 mb-xl-0">
-          <h3 class="font-weight-bold">Welcome <?php echo $_SESSION['session_fullname'] ?></h3>
+          <h3 class="font-weight-bold">Welcome <?php echo htmlspecialchars($_SESSION['session_fullname'] ?? '', ENT_QUOTES, 'UTF-8') ?></h3>
           <h6 class="font-weight-normal mb-0">This is your dashboard</h6>
-        </div>     
+        </div>
       </div>
     </div>
   </div>
@@ -16,7 +16,7 @@
           <img src="images/people.svg" alt="people">
           <div class="weather-info">
           <div class="time">
-              <h1 class="animated fadeInLeft"><?php echo date("H:i")?></h1>      
+              <h1 class="animated fadeInLeft"><?php echo date("H:i")?></h1>
               <p class="animated fadeInRight"><?php echo date("D, j M Y");?></p>
             </div>
             <?php
@@ -29,9 +29,9 @@
               <div class="ml-2">
                 <h4 class="location font-weight-normal">Kathmandu</h4>
                 <h6 class="font-weight-normal">Nepal</h6>
-              </div>                      
+              </div>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -45,7 +45,7 @@
               <p class="fs-30 mb-2"><?php
               echo count($objectClub->selectAll());
               ?></p>
-              
+
             </div>
           </div>
         </div>
@@ -81,8 +81,8 @@
         </div>
       </div>
     </div>
-  </div>         
-  <div class="row">            
+  </div>
+  <div class="row">
     <div class="col-lg-12 grid-margin stretch-card">
       <div class="card">
         <div class="card-body">
@@ -90,7 +90,7 @@
           <div class="table-responsive">
             <table class="table table-striped">
               <thead>
-                <tr>                         
+                <tr>
                   <th>#</th>
                   <th>
                     Name
@@ -103,25 +103,25 @@
                   </th>
                   <th>
                     Contact Number
-                  </th>  
-                  <th>Option</th>                        
+                  </th>
+                  <th>Option</th>
                 </tr>
               </thead>
               <tbody>
-                <?php 
+                <?php
                 $usersList = $objectUser->getLatestMembers(1);
                 $counter=0;
-                foreach($usersList as $singleUser){                  
+                foreach($usersList as $singleUser){
                   ?>
-                <tr>   
+                <tr>
                   <td class="py-1">
-                  <?php echo ++$counter;?> 
-                </td>                       
+                  <?php echo ++$counter;?>
+                </td>
                   <td>
                   <?php echo $singleUser->full_name;?>
                   </td>
                   <td>
-                  <?php 
+                  <?php
                   $clubFound=$objectClub->getMembersClubDetail($singleUser->member_id);
                   if(!empty($clubFound))
                     echo $clubFound->club_name;
@@ -138,7 +138,7 @@
                   <td><?php if( trim($singleUser->profile_link??'')!=''){ ?><a type="button" class="btn btn-primary btn-rounded btn-fw" href="<?php echo $singleUser->profile_link?>">Personal Info</a> <?php } ?></td>
                 </tr>
                 <?php } ?>
-                
+
               </tbody>
             </table>
           </div>

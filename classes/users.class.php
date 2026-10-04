@@ -165,6 +165,15 @@ class users extends common {
         return $resultRow;
     }
 
+    // Returns true if the given PN Number (members.member_id) already belongs
+    // to a different account than $excludeUserId (the internal primary key).
+    function pnNumberBelongsToAnotherMember($pnNumber, $excludeUserId){
+        $pnNumber = $this->escape($pnNumber);
+        $excludeUserId = $this->safeInt($excludeUserId);
+        $existing = $this->selectRow(self::TABLE, array(self::PRIMARY_ID), "member_id='$pnNumber' AND ".self::PRIMARY_ID."!='$excludeUserId'");
+        return !empty($existing);
+    }
+
     function getmemberIdFromEmailOrMobile($emailOrMobile){
         $emailOrMobile = $this->escape($emailOrMobile);
         return parent::selectRow(self::TABLE,array("*"),"email='$emailOrMobile' or mobile_number='$emailOrMobile'");

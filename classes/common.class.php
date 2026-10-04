@@ -56,7 +56,7 @@ class common extends connection{
 		}
 
 
-	function selectJoin($tableOne, $tableTwo, $fields1=array(), $fields2=array(), $joinType, $commonFieldJoinCondition, $where='', $orderby='',$groupby='', $startlimit='', $perPageLimit=''){
+	function selectJoin($tableOne, $tableTwo, $fields1, $fields2, $joinType, $commonFieldJoinCondition, $where='', $orderby='',$groupby='', $startlimit='', $perPageLimit=''){
 		$fieldsText="1 ";
 
 		if(count($fields1)>0){
