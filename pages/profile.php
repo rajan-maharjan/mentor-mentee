@@ -1,13 +1,5 @@
 <?php
-/*
- * $pdo must be your existing PDO connection (the one your other objects use).
- * Change this line if your bootstrap names it differently.
- */
-function h($v)
-{
-    return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
-}
-
+// Note: the h() escaping helper is defined once, globally, in files.inc.php.
 $userID  = $_SESSION['session_user_id'];
 $userDetail = $objectUser->getDetail($userID);
 $roleList   = MemberClubrole::getroles();
@@ -86,7 +78,7 @@ if (isset($_POST['btnSubmit'])) {
         $hasError = true;
         $messageText .= "<br />Missing PN Number of Toastmaster International Portal";
     }
-    
+
     if ($intro === '') {
         $hasError = true;
         $messageText .= "<br />Missing your short intro.";
@@ -126,7 +118,7 @@ if (isset($_POST['btnSubmit'])) {
             continue;
         }
         $seen[$cid] = true;
-        $clubRows[] = array('id'=>$club_role_id, 'club_id' => $cid, 'role_code' => $role_code, 'is_primary' => $isPrimary ? 1 : 0);                     
+        $clubRows[] = array('id'=>$club_role_id, 'club_id' => $cid, 'role_code' => $role_code, 'is_primary' => $isPrimary ? 1 : 0);
     }
 
     $primaryRow = null;
@@ -162,10 +154,10 @@ if (isset($_POST['btnSubmit'])) {
         $arrayData['member_type']     = '2';
         $arrayData['updated_by']      = $userID;
         $arrayData['updated_on']      = date("Y-m-d H:i:s");
-        
+
         try {
             $objectUser->insertUpdate($arrayData, $userID);
-            $objectMemberClub->saveAll($memberId, $clubRows);
+            $objectMemberClub->saveAll($pnNumber, $clubRows);
             $messageText = "<script language='javascript'>alert('Successfully updated your information.');window.location='profile.html'</script>";
         } catch (Exception $e) {
             error_log('Profile update failed: ' . $e->getMessage());
@@ -177,7 +169,7 @@ if (isset($_POST['btnSubmit'])) {
 
 // ---- Rows to display (POST on error > saved rows > legacy single club > blank) ----
 if (!$formRows) {
-    $saved = $objectMemberClub->getByMember($memberId);
+    $saved = $objectMemberClub->getByMember($userID);
     foreach ($saved as $s) {
         $formRows[] = (object) array('id'=> $s->id, 'club_id' => $s->club_id, 'role_code' => $s->role_code, 'is_primary' => $s->is_primary);
     }

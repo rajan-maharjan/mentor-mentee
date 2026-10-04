@@ -1,10 +1,10 @@
 <?php
 class functions extends common{
-    
+
   	function __construct(){
-			
+
 		}
-	
+
 	function getJWTToken($username, $password) {
         $url = TIN_WEBSITE.'wp-json/jwt-auth/v1/token';
         $ch = curl_init($url);
@@ -17,15 +17,15 @@ class functions extends common{
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
         ]);
-        
+
         $result = curl_exec($ch);
-    
+
         if (curl_errno($ch)) {
             echo 'cURL error: ' . curl_error($ch);
         }
-    
+
         curl_close($ch);
-        
+
         $response = json_decode($result);
         return $response->token; // This is the JWT token
     }
@@ -36,33 +36,33 @@ class functions extends common{
         $usernameLength = strlen($username);
         $visibleChars = 3;
         $maskedChars = $usernameLength - $visibleChars;
-    
-    
+
+
         $maskedUsername = substr($username, 0, $visibleChars) . str_repeat('*', $maskedChars);
         $maskedEmail = $maskedUsername . "@" . $domain;
-    
+
         return $maskedEmail;
     }
-    	
+
 	function sendEmail($receiverEmail, $subject, $content) {
 		global $objectSendMail;
-		
+
 		try{
 		    $objectSendMail->SMTPDebug = 0;                                       // Enable verbose debug output
-            $objectSendMail->isSMTP();  
+            $objectSendMail->isSMTP();
 		    $objectSendMail->Host       = 'mail.rajanmaharjan.com.np';                     // Specify main and backup SMTP servers
             $objectSendMail->SMTPAuth   = true;                                   // Enable SMTP authentication
             $objectSendMail->Username   = 'mentor-mentee@rajanmaharjan.com.np';               // SMTP username
             $objectSendMail->Password   = 'C0ntact@123';                  // SMTP password
-            $objectSendMail->Port       = 587;      
+            $objectSendMail->Port       = 587;
             $objectSendMail->isHTML(true);
             $objectSendMail->setFrom(NO_REPLY_EMAIL, SITE_NAME);
-            
-            
+
+
     		$objectSendMail->addAddress($receiverEmail);
     		#$objectSendMail->addAddress("friendship.rajan@gmail.com");
     		$objectSendMail->Subject = $subject;
-    		
+
     		$arrayReplaceFor=array("#PATH#","#LOGO#","#SITE_NAME#","#CONTENT#","#FOOTER#");
     		$arrayReplaceWith=array(
     					SITE_PATH,
@@ -72,36 +72,52 @@ class functions extends common{
     					''
     					);
     		$finalContent=str_replace($arrayReplaceFor,$arrayReplaceWith,file_get_contents("email.tmpl"));
-    
+
     		$objectSendMail->Body = html_entity_decode($finalContent);
     	    $objectSendMail->send();
 		 	} catch (Exception $e) {
                 echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
             }
 	}
-	
+
 	function generateStrongPassword($length = 8){
 		$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
 		$count = strlen($chars);
-	
+
 		for ($i = 0, $result = ''; $i < $length; $i++) {
-			$index = rand(0, $count - 1);
+			$index = random_int(0, $count - 1);
 			$result .= substr($chars, $index, 1);
 		}
 
 		return $result;
 	}
-	
+
+	// Returns the CSRF token for the current session, creating one if needed.
+	function getCsrfToken(){
+		if(empty($_SESSION['csrf_token'])){
+			$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+		}
+		return $_SESSION['csrf_token'];
+	}
+
+	// Validates a token submitted by a form/AJAX call against the session's token.
+	function validateCsrfToken($submittedToken){
+		if(empty($_SESSION['csrf_token']) || empty($submittedToken)){
+			return false;
+		}
+		return hash_equals($_SESSION['csrf_token'], $submittedToken);
+	}
+
 	function isValidEmail($input){
 	    $emailRegex =  '/^[a-zA-Z0-9._]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/';
 	    return preg_match($emailRegex, trim($input));
 	}
-	
+
 	function isValidMobile($input){
 	    $phoneRegex = '/^9\d{9}$/';
 	    return preg_match($phoneRegex, trim($input));
 	}
-	
+
 	function isValidateContact($input) {
         $isCorrect = false;
         if ($this->isValidEmail($input)) {
@@ -114,7 +130,7 @@ class functions extends common{
         return $isCorrect;
     }
 
-	
+
 	function getPageName($page){
 		switch($page){
 			case 'fb-update':$pageName="updateFB";break;
@@ -122,17 +138,17 @@ class functions extends common{
 		}
 		return $pageName;
 	}
-	
+
 	function filterPage(){
-		if( ! isset($_GET['page']) || (isset($_GET['page']) && trim($_GET['page'])!='' && ! file_exists('pages/'.trim($_GET['page']).'.php'))){				
+		if( ! isset($_GET['page']) || (isset($_GET['page']) && trim($_GET['page'])!='' && ! file_exists('pages/'.trim($_GET['page']).'.php'))){
 			 echo "<script>window.location='index.php'</script>";
-		}			
-		else 
+		}
+		else
 			return $_GET['page'];
 	}
 
-	function __destruct(){		
-		
+	function __destruct(){
+
 	}
 
 }

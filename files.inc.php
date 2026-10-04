@@ -1,9 +1,24 @@
 <?php
 //phpinfo();
 ini_set("date.timezone", "Asia/Kathmandu");
-#error_reporting(E_ALL);
+error_reporting(E_ALL);
+
+// Harden session cookie: not readable by JS, and not sent cross-site, which
+// mitigates session theft via XSS and some CSRF vectors. 'secure' is left to
+// the server's HTTPS config (enable it once the site is served over TLS).
+session_set_cookie_params([
+	'httponly' => true,
+	'samesite' => 'Lax',
+]);
 session_start();
 
+// Global output-escaping helper used throughout the templates to prevent XSS.
+if(!function_exists('h')){
+	function h($v){
+		return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+	}
+}
+#die("INSIDE FILES");
 //require 'PHPMailer/Exception.php';
 require 'PHPMailer/SMTP.php';
 

@@ -21,12 +21,14 @@ class appointments extends common {
     }
 
     function getDetail($primaryId) {
+        $primaryId = $this->safeInt($primaryId);
         return $this->selectRow(self::TABLE, array("*"), self::PRIMARY_ID . "='$primaryId'");
     }
 
     function insertUpdate($arrayFieldValues, $primaryId = 0) {
         $excludeFields = array();
-        if (intval($primaryId) > 0) {            
+        $primaryId = $this->safeInt($primaryId);
+        if ($primaryId > 0) {
             parent::update(self::TABLE, $arrayFieldValues, self::PRIMARY_ID . "='$primaryId'", $excludeFields);
             return $primaryId;
         }
@@ -35,6 +37,7 @@ class appointments extends common {
     }
 
     function remove($primaryId) {
+        $primaryId = $this->safeInt($primaryId);
         return $this->delete(self::TABLE, self::PRIMARY_ID . "='$primaryId'");
     }
 }

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<?php 
+<?php
 $relativePath  = "";
 include "files.inc.php";
 if(!isset($_SESSION['session_user_id']) or !isset($_SESSION['session_email']) or trim($_SESSION['session_user_id']??'')=='' or trim($_SESSION['session_email'])==''){
@@ -25,7 +25,7 @@ if(!isset($_SESSION['session_user_id']) or !isset($_SESSION['session_email']) or
   <title>Toastmaster Portal :: Dashboard</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="<?php echo SITE_PATH?>vendors/feather/feather.css">
-  
+
   <link rel="stylesheet" href="<?php echo SITE_PATH?>vendors/ti-icons/css/themify-icons.css">
   <!-- End plugin css for this page -->
   <!-- inject:css -->
@@ -35,6 +35,7 @@ if(!isset($_SESSION['session_user_id']) or !isset($_SESSION['session_email']) or
   <link rel="shortcut icon" href="<?php echo IMAGE_PATH?>favicon.png" />
   <script language="javascript">
     var _sitePath="<?php echo SITE_PATH?>";
+    var _csrfToken="<?php echo $objectFunctions->getCsrfToken()?>";
   </script>
 </head>
 <body>
@@ -49,8 +50,12 @@ if(!isset($_SESSION['session_user_id']) or !isset($_SESSION['session_email']) or
       <div class="main-panel">
       <div class="content-wrapper">
         <?php
-        if(isset($_GET['url1']) && trim($_GET['url1']??'')!=''){
-          include "pages/".trim($_GET['url1']??'').".php";
+        // Fix for Local File Inclusion: only ever include a page from this
+        // fixed whitelist. Never build the include path from raw user input.
+        $allowedPages = array('agenda-list','appointment','change-password','clubs','dashboard','mentee','mentorship','profile','search');
+        $requestedPage = isset($_GET['url1']) ? trim($_GET['url1']) : '';
+        if($requestedPage!=='' && in_array($requestedPage, $allowedPages, true)){
+          include "pages/".$requestedPage.".php";
         }
         else
           include "pages/dashboard.php";?>
@@ -70,7 +75,7 @@ if(!isset($_SESSION['session_user_id']) or !isset($_SESSION['session_email']) or
   <script src="<?php echo JS_PATH?>vendor.bundle.base.js"></script>
   <script src="<?php echo JS_PATH?>template.js"></script>
   <script src="<?php echo JS_PATH?>off-canvas.js"></script>
-  <script src="<?php echo JS_PATH?>jquery-ui.js"></script>    
+  <script src="<?php echo JS_PATH?>jquery-ui.js"></script>
   <script src="<?php echo JS_PATH?>jquery.bs.calendar.js"></script>
   <script src="<?php echo JS_PATH?>onload.js"></script>
   </body>

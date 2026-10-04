@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<?php 
+<?php
 $relativePath='';
-include "files.inc.php"; 
+include "files.inc.php";
 ?>
-<head> 
+<head>
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -33,23 +33,26 @@ if(isset($_POST['btnLogin'])){
   $password = trim($_POST['password']??'');
   $hasError=true;
   
-  if($objectFunctions->isValidateContact($email)==false){
+  if(!$objectFunctions->validateCsrfToken($_POST['csrf_token'] ?? '')){
+        $hasError=true;
+        $messageText="Opps! Your session has expired. Please try again.";
+    }
+  elseif($objectFunctions->isValidateContact($email)==false){
         $hasError=true;
         $messageText="Opps! Please enter valid mobile number (e.g: 9XXXXXXXX0) or valid email address (e.g: example@domain.com).";
     }
     else{
-        $objectFunctions->sql= "Insert into tin_member_login_logs (member_email) values ('$email')";
-        $objectFunctions->execute();
-    	
-     
+      $objectFunctions->sql= "Insert into tin_member_login_logs (member_email) values ('$email')";
+      $objectFunctions->execute();
       $userData = $objectUser->authenticate($email,$password);
-     
-      if(false==empty($userData)){ 
+      print_r($userData);
+      if(false==empty($userData)){
+          session_regenerate_id(true);
           $_SESSION['session_fullname']=$userData->full_name;
           $_SESSION['session_email']=$email;
           $_SESSION['session_user_id']=$userData->id;
           $_SESSION['session_member_id']=$userData->member_id;
-         
+
           if($userData->pwd_reset_request=="Y"){
             echo "<script language='javascript'>window.location='".SITE_PATH."change-password.html';</script>";
             die("AFTER");
@@ -67,7 +70,7 @@ if(isset($_POST['btnLogin'])){
         $hasError=true;
         $messageText="Opps! Looks like your email/mobile and password combination is incorrect. If you cannot remember your password, you can <a href='".SITE_PATH."forgot-password.php'>reset it</a> and get the new one in your email";
       }
-    } 
+    }
 }
 
 if(isset($_SESSION['message'])){
@@ -91,6 +94,7 @@ if(isset($_SESSION['message'])){
               <h4>A directory of Toastmasters Members</h4>
               <p class="text-warning">This is completely different portal and its login is different from Toastmasters International. Do not confuse with username/password that is used for Toastmastsers International website - https://www.toastmasters.org/</p>
               <form class="pt-3" method="POST" action="" name="login-form" id="login-form">
+                  <input type="hidden" name="csrf_token" value="<?php echo $objectFunctions->getCsrfToken()?>" />
                   <?php if($messageText!=''){?>
                             <div id="message_box" class="text-<?php echo ($hasError?"danger":"success")?>"><?php echo $messageText?></div>
               <?php } ?>
@@ -112,7 +116,7 @@ if(isset($_SESSION['message'])){
                   </div>
                   <a href="<?php echo SITE_PATH?>forgot-password.php" class="auth-link text-black">Forgot password?</a>
                 </div>
-                
+
                 <div class="text-center mt-4 font-weight-light">
                   Don't have an account? <a href="register.php" class="text-primary">Request One</a>
                 </div>

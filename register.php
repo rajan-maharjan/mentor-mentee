@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-<?php 
+<?php
 $relativePath='';
-include "files.inc.php"; 
+include "files.inc.php";
 ?>
 <head>
   <!-- Required meta tags -->
@@ -10,7 +10,7 @@ include "files.inc.php";
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title><?php echo SITE_NAME?></title>
   <!-- plugins:css -->
-  
+
   <link rel="stylesheet" href="<?php echo CSS_PATH?>style.css">
   <!-- endinject -->
   <link rel="shortcut icon" href="<?php echo IMAGE_PATH?>favicon.png" />
@@ -34,10 +34,14 @@ if(isset($_POST['btnSignUp'])){
     $email=strtolower(trim($_POST['email']??''));
     $mobileNumber = trim($_POST['mobile_number']??'');
     $clubId=$_POST['club_id'];
-    
+
     $hasError=true;
-    
-    if (!$objectFunctions->isValidEmail($email)) {
+
+    if(!$objectFunctions->validateCsrfToken($_POST['csrf_token'] ?? '')){
+       $hasError=true;
+       $messageText="Opps! Your session has expired. Please refresh the page and try again.";
+    }
+    elseif (!$objectFunctions->isValidEmail($email)) {
        $hasError=true;
        $messageText="Opps! Please enter valid email address (e.g: example@domain.com).";
     } elseif (!$objectFunctions->isValidMobile($mobileNumber)) {
@@ -48,7 +52,7 @@ if(isset($_POST['btnSignUp'])){
     $messageText="Opps! Looks like you missed to choose your club.";
   }
   elseif(empty($objectUser->checkExists(0,$email,$mobileNumber))){
-      $arrayData = array('email'=>$email,'club_id'=>$clubId,'mobile_number'=>$mobileNumber,'is_active'=>1);
+      $arrayData = array('email'=>$email,'club_id'=>(int)$clubId,'mobile_number'=>$mobileNumber,'is_active'=>1);
       $objectUser->insertUpdate($arrayData);
       $subject="Thank you for registering with ".SITE_NAME;
       $content="Dear $email<br />
@@ -61,7 +65,7 @@ if(isset($_POST['btnSignUp'])){
     $hasError=true;
     $messageText="Opps! Looks like either your mobile number or email address is already registered. You may try to <a href='".SITE_PATH."login.php'>login directly</a>.";
   }
-    
+
 }
 ?>
 
@@ -77,29 +81,30 @@ if(isset($_POST['btnSignUp'])){
               </div>
               <h4>Already a Toastmaster? Want to get access to directory?</h4>
               <p class="text-warning">Should you have any issue login to this portal or registration. Please send screenshot of the issue/error to mail@rajanmaharjan.com.np or whatsapp to 9851122778</p>
-              
+
               <h6 class="font-weight-light">Signing up is easy. It only takes a few seconds and email verification</h6>
               <form method="POST" action="" class="pt-3" name="registration-form" id="registration-form">
+                   <input type="hidden" name="csrf_token" value="<?php echo $objectFunctions->getCsrfToken()?>" />
                    <?php if($messageText!=''){?>
               <div id="message_box" style="margin-bottom:10px" class="btn btn-<?php echo ($hasError?"danger":"success")?>"><?php echo $messageText?></div>
               <?php }?>
               <div class="form-group">
-                  <input type="email" class="form-control form-control-lg" id="email" name="email" placeholder="Email registered in toastmaster.org" required value="<?php echo isset($_POST['email'])?$_POST['email']:'' ?>">
+                  <input type="email" class="form-control form-control-lg" id="email" name="email" placeholder="Email registered in toastmaster.org" required value="<?php echo isset($_POST['email'])?h($_POST['email']):'' ?>">
                 </div>
                 <div class="form-group">
                   <select class="form-control" id="club_id" name="club_id" required>
                     <option value='0'>Club Name</option>
-                    <?php 
+                    <?php
                     $clubList = $objectClub->selectAll();
                     foreach($clubList as $singleClub){
                       $curArea = $objectClub->getCurrentArea($singleClub->club_id);
-                      echo '<option value="'.$singleClub->club_id.'">'.$singleClub->club_name.' ('.$curArea.')</option>';
+                      echo '<option value="'.(int)$singleClub->club_id.'">'.h($singleClub->club_name).' ('.h($curArea).')</option>';
                     }
                     ?>
                   </select>
                 </div>
                 <div class="form-group">
-                  <input type="number" class="form-control form-control-lg" id="mobile_number" name="mobile_number" placeholder="Mobile Number" minlength="10" maxlength="10" required value="<?php echo isset($_POST['mobile_number'])?$_POST['mobile_number']:'' ?>">
+                  <input type="number" class="form-control form-control-lg" id="mobile_number" name="mobile_number" placeholder="Mobile Number" minlength="10" maxlength="10" required value="<?php echo isset($_POST['mobile_number'])?h($_POST['mobile_number']):'' ?>">
                 </div>
                 <div class="mt-3">
                   <button type="submit" class="btn btn-primary  btn-block" name="btnSignUp" id="btnSignUp">SIGN UP</button>

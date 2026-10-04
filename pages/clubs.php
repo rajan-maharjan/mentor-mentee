@@ -43,7 +43,6 @@
                           <td>
                               <?php                              
                               $presidentDetail = $objectClub->getPresident($singleClub->club_id);
-                              
                               if(! empty($presidentDetail)){
                                ?>
                               <a href="<?php echo $presidentDetail->profile_link?>" target="_blank">
@@ -52,9 +51,9 @@
                             <?php  } else echo "n/a";?>
                           </td>
                           <td><?php 
-                                    if(trim($singleClub->club_whatspp_phone)!='')
+                                    if(isset($singleClub->club_whatspp_phone) && trim($singleClub->club_whatspp_phone)!='')
                                         echo $singleClub->club_whatspp_phone;
-                                    else if(! empty($presidentDetail)){
+                                    else if(!empty($presidentDetail) && (isset($presidentDetail->email) || isset($presidentDetail->mobile_number)) ){
                                       echo $presidentDetail->email;
                                       echo ($presidentDetail->show_mobile=='Y')?(' / '.$presidentDetail->mobile_number):'';
                                     }

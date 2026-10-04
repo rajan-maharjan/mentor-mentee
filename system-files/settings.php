@@ -4,5 +4,5 @@ $dbName="rajanmah_mm_dbms";
 $dbUserName="root";
 $dbUserPwd="";
 
-define("SITE_PATH","https://localhost/mentor-mentee/");
+define("SITE_PATH","http://localhost/mentor-mentee/");
 ?>

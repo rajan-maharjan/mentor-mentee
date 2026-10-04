@@ -21,22 +21,28 @@ class requests extends common {
     }
 
     function getDetail($requestId) {
+        $requestId = $this->safeInt($requestId);
         return $this->selectRow(self::TABLE, array("*"), self::PRIMARY_ID . "='$requestId'");
     }
 
     function checkRequestExists($requestedTo) {
-        return $this->selectRow(self::TABLE, array("*"), "is_active!='2' and status!='C' and requested_to='$requestedTo' and requested_by='".$_SESSION['session_user_id']."'");
+        $requestedTo = $this->safeInt($requestedTo);
+        $sessionUserId = $this->safeInt($_SESSION['session_user_id'] ?? 0);
+        return $this->selectRow(self::TABLE, array("*"), "is_active!='2' and status!='C' and requested_to='$requestedTo' and requested_by='$sessionUserId'");
     }
 
     function approveRequest($requestId) {
+        $requestId = $this->safeInt($requestId);
         return $this->update(self::TABLE, array("status"=>'A', 'approved_on'=>date("Y-m-d H:i:s")), self::PRIMARY_ID . "='$requestId'");
     }
 
     function completeRequest($requestId) {
+        $requestId = $this->safeInt($requestId);
         return $this->update(self::TABLE, array("status"=>'C', 'completed_on'=>date("Y-m-d H:i:s")), self::PRIMARY_ID . "='$requestId'");
     }
 
     function cancelRequest($requestId) {
+        $requestId = $this->safeInt($requestId);
         return $this->delete(self::TABLE, self::PRIMARY_ID . "='$requestId'");
     }
 }

@@ -10,7 +10,7 @@ $(document).ready(function(){
             jQuery.ajax({
                 type:"POST",
                 url:_sitePath+"ajax.php",
-                data:{choice:'sendrequest',receiver:_id},									
+                data:{choice:'sendrequest',receiver:_id, csrf_token: _csrfToken},									
                 success: function(msg){
                     if(msg==1)
                         $(_this).parent().html('Request Sent.');	
@@ -29,7 +29,7 @@ $(document).ready(function(){
                 jQuery.ajax({
                     type:"POST",
                     url:_sitePath+"ajax.php",
-                    data:{choice:'cancelrequest',request_id:_id},									
+                    data:{choice:'cancelrequest',request_id:_id,csrf_token: _csrfToken},									
                     success: function(msg){
                         if(msg==1){
                             $(_this).parent().parent().slideUp();
@@ -48,7 +48,7 @@ $(document).ready(function(){
                 jQuery.ajax({
                     type:"POST",
                     url:_sitePath+"ajax.php",
-                    data:{choice:'approverequest',request_id:_id},									
+                    data:{choice:'approverequest',request_id:_id,csrf_token: _csrfToken},									
                     success: function(msg){
                         $(_this).parent().html($msg);                   	
                         }				
@@ -65,7 +65,7 @@ $(document).ready(function(){
                 jQuery.ajax({
                     type:"POST",
                     url:_sitePath+"ajax.php",
-                    data:{choice:'deleteappointment',request_id:_id},									
+                    data:{choice:'deleteappointment',request_id:_id,csrf_token: _csrfToken},									
                     success: function(msg){
                         if(msg==1){
                             $(_this).parent().parent().slideUp();
