@@ -44,8 +44,7 @@ if(isset($_POST['btnLogin'])){
     else{
       $objectFunctions->sql= "Insert into tin_member_login_logs (member_email) values ('$email')";
       $objectFunctions->execute();
-      $userData = $objectUser->authenticate($email,$password);
-      print_r($userData);
+      $userData = $objectUser->authenticate($email,$password);      
       if(false==empty($userData)){
           session_regenerate_id(true);
           $_SESSION['session_fullname']=$userData->full_name;
