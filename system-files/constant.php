@@ -13,9 +13,9 @@ define("SITE_ADMIN_EMAIL","noreply@toastmastersnepal.org");
 define('NO_REPLY_EMAIL',SITE_ADMIN_EMAIL);
 
 /*email*/
-define('EMAIL_HOST','mail.rajanmaharjan.com.np');
-define("ADMIN_EMAIL","mentor-mentee@rajanmaharjan.com.np");
-define('SMTP_PASSWORD', 'C0ntact@123');
+define('EMAIL_HOST','mail.google.com.np');
+define("ADMIN_EMAIL","user@email.com.np");
+define('SMTP_PASSWORD', 'Email@123');
 
 
 /* table defination */
