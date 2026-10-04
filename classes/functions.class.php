@@ -50,10 +50,10 @@ class functions extends common{
 		try{
 		    $objectSendMail->SMTPDebug = 0;                                       // Enable verbose debug output
             $objectSendMail->isSMTP();
-		    $objectSendMail->Host       = 'mail.rajanmaharjan.com.np';                     // Specify main and backup SMTP servers
+		    $objectSendMail->Host       = EMAIL_HOST;                     // Specify main and backup SMTP servers
             $objectSendMail->SMTPAuth   = true;                                   // Enable SMTP authentication
-            $objectSendMail->Username   = 'mentor-mentee@rajanmaharjan.com.np';               // SMTP username
-            $objectSendMail->Password   = 'C0ntact@123';                  // SMTP password
+            $objectSendMail->Username   = ADMIN_EMAIL;               // SMTP username
+            $objectSendMail->Password   = SMTP_PASSWORD;                  // SMTP password
             $objectSendMail->Port       = 587;
             $objectSendMail->isHTML(true);
             $objectSendMail->setFrom(NO_REPLY_EMAIL, SITE_NAME);
