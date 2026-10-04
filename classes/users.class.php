@@ -128,7 +128,7 @@ class users extends common {
         $phone = $this->escape($phone);
         if ($memberId > 0){
             $memberId = $this->safeInt($memberId);
-            return $this->selectRow(self::TABLE, array(self::PRIMARY_ID), "(email='" . $email . "' or mobile_number='".$phone."') AND member_id !='" . $memberId . "'");
+            return $this->selectRow(self::TABLE, array(self::PRIMARY_ID), "(email='" . $email . "' or mobile_number='".$phone."') AND ".self::PRIMARY_ID." !='" . $memberId . "'");
         }
         else
             return $this->selectRow(self::TABLE, array(self::PRIMARY_ID), "(email='" . $email . "' or mobile_number='".$phone."')");
@@ -167,7 +167,7 @@ class users extends common {
 
     // Returns true if the given PN Number (members.member_id) already belongs
     // to a different account than $excludeUserId (the internal primary key).
-    function pnNumberBelongsToAnotherMember($pnNumber, $excludeUserId){
+    function checkPNNumber($pnNumber, $excludeUserId){
         $pnNumber = $this->escape($pnNumber);
         $excludeUserId = $this->safeInt($excludeUserId);
         $existing = $this->selectRow(self::TABLE, array(self::PRIMARY_ID), "member_id='$pnNumber' AND ".self::PRIMARY_ID."!='$excludeUserId'");

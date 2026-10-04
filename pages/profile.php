@@ -62,6 +62,10 @@ if (isset($_POST['btnSubmit'])) {
     $pnNumber = trim($_POST['PN_Number'] ?? '');
     $intro    = trim($_POST['intro'] ?? '');
 
+    if (!$objectFunctions->validateCsrfToken($_POST['csrf_token'] ?? '')){
+        $hasError = true;
+        $messageText .= "<br />Your session has expired. Please reload the page and try again.";
+    }
     if ($fullName === '') {
         $hasError = true;
         $messageText .= "<br />Missing your full name.";
@@ -74,21 +78,15 @@ if (isset($_POST['btnSubmit'])) {
         $hasError = true;
         $messageText .= "<br />Missing or invalid email address";
     }
-    if (!$objectFunctions->validateCsrfToken($_POST['csrf_token'] ?? '')){
+    if(!empty($objectUser->checkExists($_SESSION['session_user_id'],$email, $mobile))){
         $hasError = true;
-        $messageText .= "<br />Your session has expired. Please reload the page and try again.";
+        $messageText .= "<br />Opps! Looks like either your mobile number or email address is already registered with someone else or may have been entered wrongly. If you are sure its yours. please contact admin whatspp +977-9851122778";
     }
-    if ($pnNumber === '') {
-        $hasError = true;
-        $messageText .= "<br />Missing PN Number of Toastmaster International Portal";
-    }
-    elseif (!preg_match('/^[0-9]{1,10}$/', $pnNumber)) {
+    if (!preg_match('/^[0-9]{1,10}$/', $pnNumber)) {
         $hasError = true;
         $messageText .= "<br />PN Number must be numeric.";
-    }
-    // Fix (IDOR): this field is used as the join key for this member's club/role
-    // records, so it must never be allowed to collide with another account's.
-    elseif ($objectUser->pnNumberBelongsToAnotherMember($pnNumber, $userID)) {
+    }    
+    if ($objectUser->checkPNNumber($pnNumber, $userID)) {
         $hasError = true;
         $messageText .= "<br />That PN Number is already associated with another account.";
     }

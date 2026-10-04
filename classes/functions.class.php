@@ -112,7 +112,7 @@ class functions extends common{
 	    $emailRegex =  '/^[a-zA-Z0-9._]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/';
 	    return preg_match($emailRegex, trim($input));
 	}
-
+	
 	function isValidMobile($input){
 	    $phoneRegex = '/^9\d{9}$/';
 	    return preg_match($phoneRegex, trim($input));
