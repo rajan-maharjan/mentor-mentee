@@ -114,8 +114,9 @@ class functions extends common{
 	}
 	
 	function isValidMobile($input){
-	    $phoneRegex = '/^9\d{9}$/';
-	    return preg_match($phoneRegex, trim($input));
+	    //$phoneRegex = '/^9\d{9}$/';
+        $phoneRegex = '/^(?:(?:\+?977|00977)?(?:9[78]\\d{8})|(?:\+?91|0091)?[6-9]\\d{9}|(?:\+?88|0088)?01[3-9]\\d{8})$/';
+        return preg_match($phoneRegex, trim($input));
 	}
 
 	function isValidateContact($input) {
